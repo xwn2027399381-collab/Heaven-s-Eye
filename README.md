@@ -1,18 +1,20 @@
-# 信息真实性甄别插件 + 后端 API
+# Heaven's Eye: Information Verification Extension + Backend API
 
-这是一个可上传到 GitHub 的项目模板：浏览器插件负责捕获网页文本、图片和链接，后端 API 负责输出可信度评分、风险标签、风险说明、验证建议和证据链。
+Heaven's Eye is a GitHub-ready starter template for an information credibility checker. It includes a browser extension that captures webpage text, images, and links, plus a FastAPI backend that returns a credibility score, risk labels, risk explanations, verification suggestions, and an evidence trail.
 
-## 功能
+## Features
 
-- 捕获当前网页可见文本、图片 URL、页面链接
-- 支持手动输入文本、图片 URL、网页链接分析
-- 支持右键菜单分析选中文本、图片、链接
-- 支持点击网页元素分析，并可高亮指定关键词
-- 后端提供 `/api/verify`，响应字段使用固定中文 JSON
-- 未配置 OpenAI API Key 时提供本地模拟结果，方便前端联调
-- 配置 OpenAI API Key 后可使用 Responses API 和结构化输出生成严格 JSON
+- Capture visible text, image URLs, and links from the current webpage.
+- Analyze manually entered text, image URLs, or webpage URLs.
+- Analyze selected text, links, and images from the browser context menu.
+- Click webpage elements to analyze a specific image, link, or text block.
+- Highlight keywords on the current webpage.
+- Render API results in a simple extension popup UI.
+- Provide a `/api/verify` endpoint with a stable JSON response shape.
+- Return local mock results when `OPENAI_API_KEY` is not configured.
+- Use the OpenAI Responses API with JSON Schema structured output when an API key is configured.
 
-## 目录结构
+## Project Structure
 
 ```text
 info-verifier/
@@ -36,9 +38,9 @@ info-verifier/
 └─ LICENSE
 ```
 
-## 快速开始
+## Quick Start
 
-### 1. 启动后端
+### 1. Start the backend
 
 ```bash
 cd backend
@@ -49,71 +51,87 @@ copy ..\.env.example .env
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-如果暂时不配置 `OPENAI_API_KEY`，接口会返回模拟分析结果。
+For macOS/Linux:
 
-### 2. 加载浏览器插件
+```bash
+source .venv/bin/activate
+```
 
-1. 打开 Chrome 或 Edge 的扩展程序页面
-2. 开启开发者模式
-3. 点击“加载已解压的扩展程序”
-4. 选择 `info-verifier/plugin/`
+If `OPENAI_API_KEY` is not configured, the API returns mock analysis results so the extension can still be tested locally.
 
-### 3. 使用插件
+### 2. Load the browser extension
 
-- 点击插件图标，输入文本、链接或图片 URL 后分析
-- 点击“分析当前网页”批量分析页面文本、图片和链接
-- 点击“点击网页元素分析”，再回到网页点击图片、链接或文本区域
-- 在网页中选中文本、右键链接或右键图片，可通过右键菜单分析
-- 输入关键词后点击“高亮”，可在当前网页中标记风险关键词
+1. Open the Chrome or Edge extensions page.
+2. Enable Developer mode.
+3. Click "Load unpacked".
+4. Select `info-verifier/plugin/`.
+
+### 3. Use the extension
+
+- Click the extension icon and enter text, a URL, or an image URL for analysis.
+- Click "Analyze current page" to analyze page text, images, and links in batch.
+- Click "Click webpage element to analyze", then select an image, link, or text area on the page.
+- Select text, right-click a link, or right-click an image and use the context menu.
+- Enter a keyword and click "Highlight" to mark matching text on the current page.
 
 ## API
 
 ### `POST /api/verify`
 
-请求：
+Request:
 
 ```json
 {
   "type": "text",
-  "content": "待分析内容"
+  "content": "Content to analyze"
 }
 ```
 
-响应：
+Supported `type` values:
+
+- `text`
+- `image`
+- `url`
+
+Response:
 
 ```json
 {
   "可信度": 75,
   "风险标签": ["来源不明", "数据未验证", "情绪煽动", "AI痕迹"],
   "风险说明": {
-    "来源不明": "未找到可靠来源"
+    "来源不明": "The source cannot be verified from the provided content."
   },
-  "验证建议": ["查官方公告", "交叉验证数据", "图片反向搜索"],
-  "证据链": ["相关链接或截图"]
+  "验证建议": ["Check official announcements", "Cross-check the data", "Run reverse image search"],
+  "证据链": ["Related links or screenshots"]
 }
 ```
 
-## OpenAI 配置
+The response keys are intentionally kept in Chinese because the extension and backend share this JSON contract.
 
-复制 `.env.example` 并填写：
+## OpenAI Configuration
+
+Copy `.env.example` to `.env` and set:
 
 ```bash
 OPENAI_API_KEY=your_api_key_here
 OPENAI_MODEL=gpt-5-mini
 ```
 
-后端使用 OpenAI Responses API 处理文本和图片输入，并用 JSON Schema 约束输出，方便插件直接渲染。生产环境建议增加用户鉴权、速率限制、日志脱敏和内容保存策略。
+The backend uses the OpenAI Responses API for text and image inputs, and constrains the model output with JSON Schema so the extension can render the response directly.
 
-## 上传到 GitHub 前建议检查
+For production, add authentication, rate limiting, log redaction, monitoring, and a clear data retention policy.
 
-- 已安装 Git 并初始化仓库：`git init`
-- `.env` 没有被提交，仓库只保留 `.env.example`
-- README 能说明项目用途、启动步骤、接口格式和隐私风险
-- License 使用完整协议文本
-- 后端至少能通过 `GET /health` 和 `POST /api/verify` 基础测试
-- 插件 `manifest.json` 权限保持最小化
-- 如果要发布到 Chrome Web Store，需要补充图标、隐私政策和扩展截图
+## GitHub Upload Checklist
 
-## 免责声明
+- Git is installed and the repository is initialized.
+- `.env` is not committed; only `.env.example` is tracked.
+- The README explains the purpose, setup steps, API shape, and privacy considerations.
+- `LICENSE` contains the full license text.
+- The backend passes basic `GET /health` and `POST /api/verify` checks.
+- Browser extension permissions in `manifest.json` are kept minimal.
+- If publishing to the Chrome Web Store, add extension icons, screenshots, and a privacy policy.
 
-本项目只提供辅助甄别能力，不能替代专业事实核查、法律意见、医学意见或金融建议。AI 输出可能出错，重要结论应通过权威来源交叉验证。
+## Disclaimer
+
+This project provides assisted information verification only. It does not replace professional fact-checking, legal advice, medical advice, financial advice, or authoritative source review. AI output can be wrong, and important claims should be cross-checked with reliable sources.

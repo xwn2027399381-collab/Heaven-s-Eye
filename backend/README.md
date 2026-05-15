@@ -1,8 +1,8 @@
-# 后端 API
+# Backend API
 
-FastAPI 服务提供 `/api/verify` 接口，支持 `text`、`image`、`url` 三类输入。未配置 `OPENAI_API_KEY` 时会返回本地模拟结果，便于插件开发调试。
+This FastAPI service provides the `/api/verify` endpoint used by the browser extension. It supports `text`, `image`, and `url` inputs. If `OPENAI_API_KEY` is not configured, the service returns local mock results so the extension can be developed and tested without an external model call.
 
-## 启动
+## Start the Server
 
 ```bash
 cd backend
@@ -13,13 +13,13 @@ copy ..\.env.example .env
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-macOS/Linux 激活虚拟环境：
+For macOS/Linux:
 
 ```bash
 source .venv/bin/activate
 ```
 
-## 环境变量
+## Environment Variables
 
 ```bash
 OPENAI_API_KEY=your_api_key_here
@@ -27,25 +27,27 @@ OPENAI_MODEL=gpt-5-mini
 CORS_ALLOW_ORIGINS=*
 ```
 
-## 请求示例
+## Request Example
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/verify \
   -H "Content-Type: application/json" \
-  -d "{\"type\":\"text\",\"content\":\"这是一条待核验信息\"}"
+  -d "{\"type\":\"text\",\"content\":\"This is a claim that needs verification.\"}"
 ```
 
-## 响应格式
+## Response Format
 
 ```json
 {
   "可信度": 75,
   "风险标签": ["来源不明", "数据未验证"],
   "风险说明": {
-    "来源不明": "缺少明确发布主体",
-    "数据未验证": "缺少可交叉验证的数据来源"
+    "来源不明": "The source is not clearly identified.",
+    "数据未验证": "The claim does not include verifiable supporting data."
   },
-  "验证建议": ["查官方公告", "交叉验证数据"],
+  "验证建议": ["Check official announcements", "Cross-check the data"],
   "证据链": []
 }
 ```
+
+The Chinese response keys are part of the API contract shared with the extension UI.
