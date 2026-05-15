@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>信息真实性甄别</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>信息真实性甄别</h1>
+      <span id="status" class="status">就绪</span>
+    </header>
+
+    <section class="panel">
+      <label for="apiBaseUrl">后端 API</label>
+      <div class="row">
+        <input id="apiBaseUrl" type="url" value="http://127.0.0.1:8000" />
+        <button id="saveApiBtn" type="button">保存</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <label for="inputContent">手动分析</label>
+      <textarea id="inputContent" placeholder="输入文本、图片 URL 或网页链接"></textarea>
+      <div class="toolbar">
+        <select id="contentType">
+          <option value="text">文本</option>
+          <option value="url">链接</option>
+          <option value="image">图片</option>
+        </select>
+        <button id="analyzeBtn" type="button">分析</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <button id="captureBtn" type="button">分析当前网页</button>
+        <button id="selectBtn" type="button">点击网页元素分析</button>
+      </div>
+      <div class="toolbar">
+        <input id="highlightKeyword" placeholder="输入关键词高亮" />
+        <button id="highlightBtn" type="button">高亮</button>
+        <button id="clearHighlightBtn" type="button">清除</button>
+      </div>
+    </section>
+
+    <main id="result" class="result"></main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
